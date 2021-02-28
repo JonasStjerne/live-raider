@@ -19,76 +19,59 @@ app.get('/', (req, res) => {
     res.send(`Hi! Server is listening on port ${port}`)
 });
 
-
 app.listen(port); //Start listening
 
-//Functions to send request to twitch api. Returns answer as javascript object
-function sendPostRequest(req, answer) {
-    request.post(req, function (err, res) {
-        if (err) throw err;
-        answer(JSON.parse(res.body));
-    });
+function sendPostRequest(req) {
+    return new Promise((resolve, reject) => {
+        request.post(req, (err, res) => {
+            if (err) {
+                console.log("Request failed: " + err)
+                reject(err);
+            } else {
+                console.log(res.body);
+                resolve(JSON.parse(res.body));
+            }
+        });
+    })
 }
 
-function sendGetRequest(req, answer) {
-    request.get(req, function (err, res) {
-        if (err) throw err;
-        answer(JSON.parse(res.body));
-    });
+function sendGetRequest(req) {
+    return new Promise((resolve, reject) => {
+        request.get(req, (err, res) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(JSON.parse(res.body));
+            }
+        });
+    })
 }
-
-//Sleep function - delete when promise in request is implemented
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-//Sends request to twitch api to get access token
-var twitchTokenRequest = `https://id.twitch.tv/oauth2/token?client_id=${twitch_client_id}&client_secret=${twitch_secret}&grant_type=client_credentials`;
-sendPostRequest(twitchTokenRequest, answer => {
-    twitchToken = answer.access_token;
-});
 
 async function main() {
-    await sleep(1000);
-        var afterValue = "";
-        getGames = {
-            url: `https://api.twitch.tv/helix/streams?first=3&after=${afterValue}`,
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + twitchToken,
-                "Client-Id": twitch_client_id
-            }
+    var twitchTokenRequest = `https://id.twitch.tv/oauth2/token?client_id=${twitch_client_id}&client_secret=${twitch_secret}&grant_type=client_credentials`;
+    let response = await sendPostRequest(twitchTokenRequest);
+    twitchToken = response.access_token;
+
+    getStreams = {
+        url: `https://api.twitch.tv/helix/streams`,
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + twitchToken,
+            "Client-Id": twitch_client_id
         }
-        for (i=0; 3 > i; i++) {
-            sendGetRequest(getGames, answer => {
-                console.log(answer.data[0]);
-                console.log(answer.pagination.cursor)
-                afterValue = answer.pagination.cursor;
-            })
-            await sleep(1000)
-        }
+    }
+
+    var streams = await sendGetRequest(getStreams);
+    console.log(streams);
+
+        // for (i=0; 3 > i; i++) {
+        //     sendGetRequest(getGames, answer => {
+        //         console.log(answer.data[0]);
+        //         console.log(answer.pagination.cursor)
+        //         afterValue = answer.pagination.cursor;
+        //     })
+        //     await sleep(1000)
+        // }
 }
 
 main();
-
-
-
- // console.log(getGames.after)
-        // p.then((answer) =>{
-        //     getGames.after
-        // });
-
- // let p = new Promise((resolve, reject) => {
-    //     sendGetRequest(getGames, answer => {
-    //         getGames.after = answer.pagination.cursor;
-    //         console.log(answer.data[0]);
-    //         resolve(answer);
-    //     })
-    // });
-
-
-
- // request.get(getGames, function (err, res) {
-        //     if (err) throw err; 
-        //     console.log(res.body);
-        // })
