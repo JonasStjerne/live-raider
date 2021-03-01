@@ -9,7 +9,7 @@ app.use(bodyParser.json())
 
 // Variables
 const maxViewers = 50; //Max viewers on stream for stream to be added to streamersContainer
-const maxStreamers = 200; //Max streamers to be added to streamersContainer, if not 
+const maxStreamers = 99; //Max streamers to be added to streamersContainer, if not 
 var streamersContainer = []; //Container of streamers
 
 
@@ -62,7 +62,7 @@ async function main() {
     var twitchToken = response.access_token;
 
     //Set parameters for get request to get streams
-    getStreams = {
+    var getStreams = {
         url: `https://api.twitch.tv/helix/streams`,
         headers: {
             "Authorization": "Bearer " + twitchToken,
@@ -71,40 +71,52 @@ async function main() {
     }
 
     //While viewercount in first stream in data-response is higher than maxViewers go to next page
+    var run = 0;
     do {
         streams = await sendGetRequest(getStreams);
-        getStreams.url = `https://api.twitch.tv/helix/streams?first=100&after=` + streams.pagination.cursor;
-    } while (streams.data[0].viewer_counts >= maxViewers)
+        console.log("Run: " + run);
+        run ++;
+        getStreams.url = `https://api.twitch.tv/helix/streams?first=100&after=${streams.pagination.cursor}`;
+    } while (streams.data[0].viewer_count > maxViewers)
 
-    //When viewer_count is => maxViewers go to the page before
-    getStreams.url = `https://api.twitch.tv/helix/streams?first=100&before=` + streams.pagination.cursor;
+    //When viewer_count is <= maxViewers go to the page before
+    getStreams.url = `https://api.twitch.tv/helix/streams?first=100&before=${streams.pagination.cursor}`;
     streams = await sendGetRequest(getStreams);
 
     //Iterate through streams in data-reponse, and add the one with views >= maxViewers to streamersContainer
     for (let i = streams.data.length - 1; i > 0; i--) {
-        if (streams.data[i].viewer_counts <= maxViewers && streamersContainer.length < maxStreamser) {
+        console.log("For stamenet" + i);
+        if (streams.data[i].viewer_count <= maxViewers && streamersContainer.length < maxStreamers) {
             streamersContainer.push(streams.data[i]);
+            console.log("Added streamer with " + streams.data[i].viewer_count + " views to conainer. The container now contains " + streamersContainer.length + " streamers");
             continue;
-        } else if (streams.data[i].viewer_counts > maxViewers) {
+        } else if (streams.data[i].viewer_count > maxViewers) {
+            console.log("Viewer count is now " + streams.data[i].viewer_count + ". Stopping backchecking and skipping to next page");
             break;
         }
     }
+
+    //Go to next page
+    getStreams.url = `https://api.twitch.tv/helix/streams?first=100&after=${streams.pagination.cursor}`;
+    streams = await sendGetRequest(getStreams);
 
     //Add streams to streamsContainer until maxStreamers is reached
     while (streamersContainer.length < maxStreamers) {
         if ((maxStreamers  - streamersContainer.length) < 100) {
             let streamersContainerSpace = maxStreamers  - streamersContainer.length;
-            getStreams.url = `https://api.twitch.tv/helix/streams?first=${streamersContainerSpace}&after=` + streams.pagination.cursor;
+            getStreams.url = `https://api.twitch.tv/helix/streams?first=${streamersContainerSpace}&after=${streams.pagination.cursor}`;
         } else {
-            getStreams.url = `https://api.twitch.tv/helix/streams?first=100&after=` + streams.pagination.cursor;
+            getStreams.url = `https://api.twitch.tv/helix/streams?first=100&after=${streams.pagination.cursor}`;
         }
         var streams = await sendGetRequest(getStreams);
-        streamersContainer.push(streams.data);
+        Array.prototype.push.apply(streamersContainer, streams.data);
+        //console.log(streamersContainer);
+        console.log("Added " + streams.data.length + " streamers to streamersContainer. There are now " + streamersContainer.length + " in the container");
     }
 
-    console.log(streamersContainer);
     
-
+    console.log("Done. Captured " + streamersContainer.length + " streamers in container");
+    console.log(streamersContainer);
 
     // for (i=0; 50 > i; i++) {
     //     var streams = await sendGetRequest(getStreams);
