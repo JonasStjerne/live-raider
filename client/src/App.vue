@@ -8,10 +8,12 @@
     </div>
   <div class="container2">
     <div>
-      <h2>{{raiderCount}}</h2>
-      <h3>people ready to raid!</h3>
+      <h2 v-if="!ongoingRaid">{{raiderCount}}</h2>
+      <h3 v-if="!ongoingRaid">people ready to raid!</h3>
+      <div class="centerElement" id="embedTwitchStream">
+      </div>
     </div>
-      <h5 style="color: #78F6BC;">Raiding Twitch streamers with 0 viewers</h5>
+      <h5 style="color: #78F6BC;">Raiding small Twitch streamers</h5>
   </div>
   <div class="container3">
     <div class="text-center ma-2">
@@ -42,15 +44,42 @@
 </template>
 
 <script>
+
   export default {
+    name: "twitch-",
     data: () => ({
       snackbar: false,
       text: `Link copied to clipboard`,
       countDown: "1:22",
-      raiderCount: 97
+      raiderCount: 97,
+      ongoingRaid: true,
+      player: null
     }),
 
-    methods: {
+  mounted () {
+    const twitchImport = document.createElement("script");
+    twitchImport.setAttribute(
+      "src",
+      "https://embed.twitch.tv/embed/v1.js"
+    );
+    twitchImport.async = true;
+    document.head.appendChild(twitchImport)
+    new Twitch.Embed("embedTwitchStream", {
+      width: 1190,
+      height: 480,
+      channel: "esl_csgo",
+      theme: "dark"
+    });
+    
+    // options = {
+    //   width: 854,
+    //   height: 480,
+    //   channel: "esl_csgo"
+    // };
+
+  },
+
+  methods: {
     copyURL: function() {
         var url = window.location.href;
         var urlInput = document.createElement("input");
@@ -71,7 +100,7 @@
 html {
   min-height: 100vh;
   width: 100vw;
-  background-color: #0d0020;
+  background-color: #1F004D;
   font-family: 'Montserrat', sans-serif;
 }
 
