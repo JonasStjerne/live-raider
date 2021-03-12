@@ -121,4 +121,13 @@ async function main() {
 
 }
 
+var countDown = 23232;
+socketio.on("connection", socket => {
+    socket.emit("countDown", countDown);
+});
+
+//socketio.on("connection", socket => {
+// Send countdown-time to raid
+//})
+// namespace.allSockets() = gets id's for every connected maybe use to get viwercount?
 main();
