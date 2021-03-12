@@ -1,60 +1,64 @@
 <template>
-  <div>
-    <div class="container1 centerElement">
+  <div class="flexboxContainer">
+    <div class="container1">
       <div class="countDownContainer">
         <h5>Next raid in</h5>
         <h4>{{countDown}}</h4>
       </div>
     </div>
-  <div class="container2">
-    <div>
-      <h2 v-if="!ongoingRaid">{{raiderCount}}</h2>
-      <h3 v-if="!ongoingRaid">people ready to raid!</h3>
-      <div class="centerElement" id="embedTwitchStream">
+    <div class="container2">
+      <div>
+        <h2 v-if="!ongoingRaid">{{raiderCount}}</h2>
+        <h3 v-if="!ongoingRaid">people ready to raid!</h3>
+        <div v-of ="ongoingRaid" class="centerElement" id="embedTwitchStream">
+        </div>
+      </div>
+        <h5 style="color: #78F6BC;">Raiding small Twitch streamers</h5>
+    </div>
+    <div class="container3">
+      <div class="text-center ma-2">
+        <h6 style="margin-bottom: 10px;">Invite friends to participate in the raid!</h6>
+        <v-btn
+          style="margin-left: 50%; transform: translateX(-50%);"
+          @click="snackbar = true; copyURL();"
+          elevation="24"
+          rounded
+        >
+          <p>Copy link</p>
+        </v-btn>
+        <v-snackbar
+          origin=""
+          v-model="snackbar"
+          timeout="600"
+          content-class="text-center"
+          transition="scale-transition"
+        >
+          <p>{{ text }}</p>
+        </v-snackbar>
       </div>
     </div>
-      <h5 style="color: #78F6BC;">Raiding small Twitch streamers</h5>
-  </div>
-  <div class="container3">
-    <div class="text-center ma-2">
-      <h6 class="bottomText centerElement">Invite friends to participate in the raid!</h6>
-      <v-btn
-        @click="snackbar = true; copyURL();"
-        class="centerElement"
-        elevation="24"
-        bottom
-        absolute
-        rounded
-      >
-        <p>Copy link</p>
-      </v-btn>
-      <v-snackbar
-        origin=""
-        v-model="snackbar"
-        timeout="600"
-        content-class="text-center"
-        transition="scale-transition"
-      >
-        <p>{{ text }}</p>
-      </v-snackbar>
-    </div>
-  </div>
   </div>
 
 </template>
 
-<script>
-
+<script> 
+  import io from "socket.io";
   export default {
-    name: "twitch-",
     data: () => ({
       snackbar: false,
       text: `Link copied to clipboard`,
-      countDown: "1:22",
+      countDown: 30,
       raiderCount: 97,
-      ongoingRaid: true,
-      player: null
+      ongoingRaid: false,
+      player: null,
+      socket: {},
+      context: {},
     }),
+
+  created() {
+    this.socket = io();
+  },
+
 
   mounted () {
     const twitchImport = document.createElement("script");
@@ -68,15 +72,17 @@
       width: 1190,
       height: 480,
       channel: "esl_csgo",
-      theme: "dark"
+      theme: "dark",
+      muted: false,
     });
-    
-    // options = {
-    //   width: 854,
-    //   height: 480,
-    //   channel: "esl_csgo"
-    // };
 
+    this.socket.on("countDown", data => {
+      console.log("data recieved");
+      this.countDown = data;
+    }); 
+
+
+  
   },
 
   methods: {
@@ -149,22 +155,13 @@ v-snackbar p{
   text-align: center;
 } 
 
-.centerElement {
-  margin-left: 50%;
-  transform: translateX(-50%);
-}
-
-.bottomText {
-  position: absolute;
-  bottom: 60px;
-}
-
 .container1 {
   border-bottom-left-radius: 15px;
    border-bottom-right-radius: 15px;
   background-color: #373737;
   display: inline-block;
   box-shadow: 0 5px 20px black;
+  width: 200px;
 }
 
 .container2 {
@@ -177,5 +174,12 @@ v-snackbar p{
 
 .countDownContainer {
   margin: 10px 30px;
+}
+
+.flexboxContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: space-between;
 }
 </style>
