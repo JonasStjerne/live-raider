@@ -10,16 +10,19 @@
       <div>
         <h2 v-if="!ongoingRaid">{{raiderCount}}</h2>
         <h3 v-if="!ongoingRaid">people ready to raid!</h3>
-        <div v-of ="ongoingRaid" class="centerElement" id="embedTwitchStream">
+        <div v-if ="ongoingRaid" class="centerElement" id="embedTwitchStream">
         </div>
       </div>
         <h5 style="color: #78F6BC;">Raiding small Twitch streamers</h5>
     </div>
     <div class="container3">
-      <div class="text-center ma-2">
-        <h6 style="margin-bottom: 10px;">Invite friends to participate in the raid!</h6>
+      <div>
+        <h6>Invite friends to participate in the raid!</h6>
         <v-btn
-          style="margin-left: 50%; transform: translateX(-50%);"
+          style="
+          margin: 10px 0 40px;
+          margin-left: 50%;
+          transform: translateX(-50%);"
           @click="snackbar = true; copyURL();"
           elevation="24"
           rounded
@@ -42,7 +45,7 @@
 </template>
 
 <script> 
-  import io from "socket.io";
+  import { io } from "socket.io-client";
   export default {
     data: () => ({
       snackbar: false,
@@ -56,7 +59,7 @@
     }),
 
   created() {
-    this.socket = io();
+    this.socket = io("http://localhost:8000");
   },
 
 
@@ -164,14 +167,6 @@ v-snackbar p{
   width: 200px;
 }
 
-.container2 {
-  height: 70vh;
-}
-
-.container3 {
-  height: 10vh;
-}
-
 .countDownContainer {
   margin: 10px 30px;
 }
@@ -179,7 +174,16 @@ v-snackbar p{
 .flexboxContainer {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  align-content: space-between;
+  height: 100vh;
+  gap: 40px;
 }
+
+v-btn {
+  margin-left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+}
+
 </style>
