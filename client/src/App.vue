@@ -74,8 +74,7 @@
         urlInput.select();
         document.execCommand("copy");
         document.body.removeChild(urlInput);
-      }
-    },
+      }, 
 
     countDownTimer: function() {
       if(this.countDown > 0) {
@@ -84,7 +83,10 @@
           this.countDownTimer()
         }, 1000)
       }
-    },
+    }
+  },
+
+   
 
   mounted () {
     this.socket.on("countDown", data => {

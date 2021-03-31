@@ -12,7 +12,7 @@ const io = require('socket.io')(http, {
 //     socket.emit("countDown", 222);
 //     console.log("Sent data");
 // });
-var countDown = 22;
+var countDown = 100;
 io.on("connection", socket => {
     socket.emit("countDown", countDown);
     console.log("Sent data");
