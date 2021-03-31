@@ -47,23 +47,50 @@
 <script> 
   import { io } from "socket.io-client";
   export default {
-    data: () => ({
-      snackbar: false,
-      text: `Link copied to clipboard`,
-      countDown: 30,
-      raiderCount: 97,
-      ongoingRaid: false,
-      player: null,
-      socket: {},
-      context: {},
-    }),
+    data() {
+      return {
+        snackbar: false,
+        text: `Link copied to clipboard`,
+        countDown: 30,
+        raiderCount: 97,
+        ongoingRaid: false,
+        player: null,
+        socket: {},
+        context: {},
+      }
+    },
 
   created() {
-    this.socket = io("http://localhost:8000");
+    this.socket = io("http://localhost:3000");
+    this.countDownTimer();
   },
 
+  methods: {
+    copyURL: function() {
+        var url = window.location.href;
+        var urlInput = document.createElement("input");
+        document.body.appendChild(urlInput);
+        urlInput.value = url;
+        urlInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(urlInput);
+      }
+    },
+
+    countDownTimer: function() {
+      if(this.countDown > 0) {
+        setTimeout(() => {
+          this.countDown -= 1
+          this.countDownTimer()
+        }, 1000)
+      }
+    },
 
   mounted () {
+    this.socket.on("countDown", data => {
+      this.countDown = data;
+    }); 
+
     const twitchImport = document.createElement("script");
     twitchImport.setAttribute(
       "src",
@@ -78,27 +105,7 @@
       theme: "dark",
       muted: false,
     });
-
-    this.socket.on("countDown", data => {
-      console.log("data recieved");
-      this.countDown = data;
-    }); 
-
-
-  
   },
-
-  methods: {
-    copyURL: function() {
-        var url = window.location.href;
-        var urlInput = document.createElement("input");
-        document.body.appendChild(urlInput);
-        urlInput.value = url;
-        urlInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(urlInput);
-      }
-    }
 
   }
 </script>

@@ -1,17 +1,29 @@
 //---------------------Initial Server Setup-------------------------//
 const express = require("express");
-const app = express();
-const http = require("http").Server(app);
-const socketio = require("socket.io")(http);
-const request = require('request');
-const bodyParser = require('body-parser');
+const http = require("http").Server(express);
+const io = require('socket.io')(http, {
+    cors: {
+      origin: '*',
+    }
+  });
+
+// var countDown = 222;
+// io.on("connection", socket => {
+//     socket.emit("countDown", 222);
+//     console.log("Sent data");
+// });
+var countDown = 22;
+io.on("connection", socket => {
+    socket.emit("countDown", countDown);
+    console.log("Sent data");
+});
+
+http.listen(3000, () => {
+    console.log("Server is listening...");
+})
 
 
 
-const port = 8000;
-
-
-app.use(bodyParser.json())
 
 // Variables
 const maxViewers = 10; //Max viewers on stream for stream to be added to streamersContainer
@@ -23,12 +35,6 @@ var streamersContainer = []; //Container of streamers
 const twitch_client_id = 'sxkje3xw0k02b984j3zgclfr8n4mnb';
 const twitch_secret    = 'nhp0xdl4eglzhn0pga8rte7n7p1t4m';
 
-//See if server is running on port
-app.get('/', (req, res) => {
-    res.send(`Hi! Server is listening on port ${port}`)
-});
-
-app.listen(port); //Start listening
 
 //Functions to send post and get requests to twitch api, responds with a promise
 // function sendPostRequest(req) {
@@ -120,12 +126,6 @@ app.listen(port); //Start listening
 //     console.log(streamersContainer);
 
 // }
-var countDown = 23232;
-console.log("Sent data");
-socketio.on("connection", socket => {
-    socket.emit("countDown", countDown);
-    console.log("Sent data");
-});
 
 
 //socketio.on("connection", socket => {
