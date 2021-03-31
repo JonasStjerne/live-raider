@@ -93,6 +93,10 @@
       this.countDown = data;
     }); 
 
+    this.socket.on("raiderCount", data => {
+      this.raiderCount = data;
+    })
+
     const twitchImport = document.createElement("script");
     twitchImport.setAttribute(
       "src",

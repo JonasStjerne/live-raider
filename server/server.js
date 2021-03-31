@@ -7,6 +7,8 @@ const io = require('socket.io')(http, {
     }
   });
 
+var raiderCount = 0;
+
 // var countDown = 222;
 // io.on("connection", socket => {
 //     socket.emit("countDown", 222);
@@ -15,8 +17,17 @@ const io = require('socket.io')(http, {
 var countDown = 100;
 io.on("connection", socket => {
     socket.emit("countDown", countDown);
+    io.emit("raiderCount", raiderCount);
     console.log("Sent data");
+    raiderCount++;
+    console.log("Raider Joined " + raiderCount);
+    socket.on("disconnect", () => {
+      raiderCount--;
+      io.emit("raiderCount", raiderCount);
+      console.log("Raider Left " + raiderCount);
+    })
 });
+
 
 http.listen(3000, () => {
     console.log("Server is listening...");
