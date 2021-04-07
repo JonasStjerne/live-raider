@@ -1,4 +1,5 @@
 //---------------------Initial Server Setup-------------------------//
+const { count } = require("console");
 const express = require("express");
 const http = require("http").Server(express);
 const io = require('socket.io')(http, {
@@ -9,12 +10,7 @@ const io = require('socket.io')(http, {
 
 var raiderCount = 0;
 
-// var countDown = 222;
-// io.on("connection", socket => {
-//     socket.emit("countDown", 222);
-//     console.log("Sent data");
-// });
-var countDown = 100;
+var countDown = 10;
 io.on("connection", socket => {
     socket.emit("countDown", countDown);
     io.emit("raiderCount", raiderCount);
@@ -33,12 +29,16 @@ http.listen(3000, () => {
     console.log("Server is listening...");
 })
 
-
+setInterval(() => {
+  if (countDown <= 0) return;
+  countDown--;
+  console.log("countDown server " + countDown);
+}, 1000)
 
 
 // Variables
 const maxViewers = 10; //Max viewers on stream for stream to be added to streamersContainer
-const maxStreamers = 40; //Max streamers to be added to streamersContainer, if not 
+const maxStreamers = 10; //Max streamers to be added to streamersContainer, if not 
 var streamersContainer = []; //Container of streamers
 
 
