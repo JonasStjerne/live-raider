@@ -135,13 +135,15 @@ async function main() {
 
     console.log("Done. Captured " + streamersContainer.length + " streamers in container");
     console.log(streamersContainer);
+    io.emit("streamUserName", streamersContainer[0].user_login);
+    streamersContainer.splice(0,1);
 
 }
 
-console.log("test");
+
 main();
-//socketio.on("connection", socket => {
-// Send countdown-time to raid
-//})
-// namespace.allSockets() = gets id's for every connected maybe use to get viwercount?
-//main();
+setInterval(() => {
+  main();
+}, 100000)
+
+

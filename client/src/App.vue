@@ -51,9 +51,10 @@
       return {
         snackbar: false,
         text: `Link copied to clipboard`,
+        channel: String,
         countDown: 30,
         raiderCount: 97,
-        ongoingRaid: false,
+        ongoingRaid: true,
         player: null,
         socket: {},
         context: {},
@@ -97,6 +98,11 @@
       this.raiderCount = data;
     })
 
+    this.socket.on("streamUserName", data => {
+      this.channel = data;
+      console.log("Recieved channel data");
+    })
+    
     const twitchImport = document.createElement("script");
     twitchImport.setAttribute(
       "src",
@@ -107,7 +113,7 @@
     new Twitch.Embed("embedTwitchStream", {
       width: 1190,
       height: 480,
-      channel: "esl_csgo",
+      channel: "ahorn",
       theme: "dark",
       muted: false,
     });
