@@ -1,27 +1,4 @@
-# live-raider
+Website for raiding small Twitch.tv streamers. 
+Build with Vue, Node, Express and Socket.io. 
 
-> A Vue.js project
-
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
-```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+The website waits a specific amount of seconds and then displays an embedded Twitch.tv stream with a small number of views. The website displays how many users are waiting for a raid and a countdown to the raid. Twitch.tv is continuously scanned for streams under x-amount of viewers, which are added to a container to pick from.
